@@ -1,8 +1,11 @@
 from playwright.sync_api import sync_playwright, Page, Browser, Route
 from dataclasses import dataclass
+
 @dataclass
 class NovelData:
     chapters_id: list[int] = []
+
+
 class NovelScraper:
     def __init__(self, novel_page_url, starting_chapter, download_folder_path) -> None:
         self.novel_page_url = novel_page_url
@@ -92,14 +95,10 @@ class NovelScraper:
         #TODO...invalid=exit program,log..error
         pass
 
-    def _validate_starting_chapter(self, starting_chapter: str) -> ["int(starting_chapter)", "Error"]:
-        #TODO...check if starting_chapter is num
-        #TODO...num=>next if
-        #TODO...!num=>Error,exit the program
-
-        #TODO...check is starting_chapter<len(chapters)
-        #TODO...le=return int(starting chapter)
-        #TODO...gt=log error,exit the program
+    def _is_valid_starting_chapter(self) -> [bool, "Error"]:
+        #TODO...check if starting_chapter is num and <len(chap_id)
+        #TODO...num=>true
+        #TODO...!num=>while not _is_valid...(): ask for chap num and save to self.starting_chapter=starting_chapter
         pass
 
     def _validate_folder_path(self, path) -> ["absolute_path", "error"]:
@@ -111,7 +110,7 @@ class NovelScraper:
         #TODO...!exsits=>error
         pass
 
-    def scrape_novel_page() -> ["ext_chapters_id->dataclass.NovelData.chapters_id[]","error occured during scraping"]:
+    def scrape_novel_page(self) -> ["ext_chapters_id->dataclass.NovelData.chapters_id[]","error occured during scraping"]:
         #TODO...goto=novel_page_url,wight unitl load,chcek if status code=200
         #TODO...!200=error(unable to load the page ...inter error,url_is not corrate,..novel_is_not_found)
         #TODO...200=extract_novel_name=check if its not null
@@ -124,4 +123,19 @@ class NovelScraper:
         #TODO...if loaded=ext_chapters_id->dataclass.NovelData.chapters_id[]
         #TODO...!loaded=unable to load the chaptes,exsit
         #TODO...null(chapters)=error(novel has no chapters,exit)
+        pass
+
+    def scrape_chapter_page(self) -> ["load each chapter and resturn xhr response to the requ","error"]:
+        #TODO...if _is_valid_starting_chapter():
+        #TODO...>> loop from starting_chapter-len(dataclass.NovelData.chapters_id[])
+        #TODO...>> goto.chapter page
+        #TODO...>> on_chapter_page_response()...........
+        #TODO...>> logo the succc message of the saveed chap and its locaation
+        pass
+
+    def on_chapter_page_response():
+        pass
+
+    def start_scraping():
+        #TODO...impliment the the privat methods here
         pass
