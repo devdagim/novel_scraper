@@ -1,10 +1,13 @@
 from playwright.sync_api import sync_playwright, Page, Browser, Route
-
+from dataclasses import dataclass
+@dataclass
+class NovelData:
+    chapters_id: list[int] = []
 class NovelScraper:
-    def __init__(self, novel_page_url, start_chapter, download_folder_location) -> None:
+    def __init__(self, novel_page_url, starting_chapter, download_folder_path) -> None:
         self.novel_page_url = novel_page_url
-        self.scraping_starting_chapter = scraping_starting_chapter
-        self.download_folder_location = download_folder_location
+        self.start_chapter = starting_chapter
+        self.download_folder_path = download_folder_path
 
     # 1. Playwright Utilities
 
@@ -77,3 +80,48 @@ class NovelScraper:
         # https://playwright.dev/python/docs/api/class-playwright#playwright-stop
         #TODO...log info
         self.playwright.stop()
+
+    # 2. Novel Page Methods
+
+    # 2.1 check if the user entered novel_page_url
+    def _validate_url(self, url: str) -> ["str(foramted_url)", "Error"]:
+        #TODO...check is its actual url
+        #TODO...check is its url has domain of sangtacviet.vip
+        #TODO...check is its url has end with int/num=e.g:/1788 or /1777/
+        #TODO...valid=set the self.novel_page_url=url in foramt of ending with .../int/ not .../int
+        #TODO...invalid=exit program,log..error
+        pass
+
+    def _validate_starting_chapter(self, starting_chapter: str) -> ["int(starting_chapter)", "Error"]:
+        #TODO...check if starting_chapter is num
+        #TODO...num=>next if
+        #TODO...!num=>Error,exit the program
+
+        #TODO...check is starting_chapter<len(chapters)
+        #TODO...le=return int(starting chapter)
+        #TODO...gt=log error,exit the program
+        pass
+
+    def _validate_folder_path(self, path) -> ["absolute_path", "error"]:
+        #TODO...check if path valid=is it realy a path
+        #TODO...!isPath=>error,ext
+        #TODO...isPath=>check if it exsits
+
+        #TODO...exsits=>absolute_path
+        #TODO...!exsits=>error
+        pass
+
+    def scrape_novel_page() -> ["ext_chapters_id->dataclass.NovelData.chapters_id[]","error occured during scraping"]:
+        #TODO...goto=novel_page_url,wight unitl load,chcek if status code=200
+        #TODO...!200=error(unable to load the page ...inter error,url_is not corrate,..novel_is_not_found)
+        #TODO...200=extract_novel_name=check if its not null
+        #TODO...null=error(unable to load the page ...inter error,url_is not corrate,..novel_is_not_found)
+        #TODO...!null=translat to eng
+        #TODO...!eng=error(unable to translat the novel name,exit)
+        #TODO...eng=create_folder(novel_name)
+        #TODO...=create_folder(novel_name)
+        #TODO...wigth_for chapters to be loaded
+        #TODO...if loaded=ext_chapters_id->dataclass.NovelData.chapters_id[]
+        #TODO...!loaded=unable to load the chaptes,exsit
+        #TODO...null(chapters)=error(novel has no chapters,exit)
+        pass
