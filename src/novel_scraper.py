@@ -151,14 +151,6 @@ class NovelScraper:
 
         self._get_novel_name()
         novel_name = self.scraper_items.novel_name
-        import sys
-
-        print(sys.stdout.encoding)
-        print(novel_name.encode(sys.stdout.encoding, errors='replace'))
-
-        print(novel_name,"b.f")
-        novel_name = novel_name.encode('utf-8').decode()
-        print(novel_name,"b.f")
         print(">>(info):","novel name extracted:",novel_name)
         if not novel_name:
             raise NovelNameError(
@@ -264,6 +256,7 @@ class NovelScraper:
     def _get_novel_name(self):
         """Extracts the novel name from the page."""
         novel_name = self.page.locator("h1#book_name2").text_content()
+        print("test-------",novel_name)
         self.scraper_items.novel_name = novel_name
 
     def _validated_url(self, novel_page_url: str) -> Union[str, None]:
