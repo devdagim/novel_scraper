@@ -15,8 +15,11 @@ jobs:
         with:
           python-version: 3.8
 
-      - name: Install dependencies
+      - name: Install pip packages
         run: pip install -r requirements.txt
+
+      - name: Install playwright dependencies
+        run: playwright install
 
       - name: Run scraper
         run: python main.py
