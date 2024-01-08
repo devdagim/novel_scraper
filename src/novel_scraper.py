@@ -1,7 +1,6 @@
 # Standard Library Imports
 from time import sleep
 from typing import Union
-from dataclasses import dataclass
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
 import io
@@ -25,11 +24,11 @@ from src.scraper_expectation import (
     TranslationError,
 )
 
-@dataclass
 class ScraperItems:
-    novel_name: str
-    chapters_id: list
-    novel_folder_path: str
+    def __init__(self, novel_name, chapters_id, novel_folder_path):
+        self.novel_name = novel_name
+        self.chapters_id = chapters_id
+        self.novel_folder_path = novel_folder_path
 
 
 # ANSI escape codes for color
