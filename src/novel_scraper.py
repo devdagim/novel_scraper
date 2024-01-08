@@ -28,7 +28,7 @@ from src.scraper_expectation import (
 @dataclass
 class ScraperItems:
     novel_name: str
-    chapters_id: list[int]
+    chapters_id: list
     novel_folder_path: str
 
 
