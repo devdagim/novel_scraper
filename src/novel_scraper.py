@@ -29,9 +29,9 @@ from src.scraper_expectation import (
 
 @dataclass
 class ScraperItems:
-    novel_name: AnyStr
+    novel_name: str
     chapters_id: List[int]
-    novel_folder_path: AnyStr
+    novel_folder_path: str
 
 
 # ANSI escape codes for color
