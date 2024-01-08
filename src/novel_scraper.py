@@ -1,6 +1,6 @@
 # Standard Library Imports
 from time import sleep
-from typing import Union,List
+from typing import Union,List,AnyStr
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
@@ -29,9 +29,9 @@ from src.scraper_expectation import (
 
 @dataclass
 class ScraperItems:
-    novel_name: str
+    novel_name: AnyStr
     chapters_id: List[int]
-    novel_folder_path: str
+    novel_folder_path: AnyStr
 
 
 # ANSI escape codes for color
