@@ -8,9 +8,9 @@ logging.basicConfig(level=logging.INFO)
 
 #saving a
 
-novel_page_url = input("novel page url: ")
-starting_chapter = input("starting chapter to scrap: ")
-download_folder_path = input("Download Folder Path: ")
+novel_page_url = "https://sangtacviet.vip/truyen/sangtac/1/17488/"#input("novel page url: ")
+starting_chapter = 1#input("starting chapter to scrap: ")
+download_folder_path = "download"#input("Download Folder Path: ")
 
 # try:
 scraper = NovelScraper()
