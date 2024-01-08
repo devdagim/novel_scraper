@@ -257,7 +257,7 @@ class NovelScraper:
     def _get_novel_name(self):
         """Extracts the novel name from the page."""
         novel_name = self.page.locator("h1#book_name2").text_content()
-        print("test-------",novel_name.encode('cp1251').decode())
+        print("test-------",novel_name.encode('utf-8',"replace").decode())
         self.scraper_items.novel_name = novel_name
 
     def _validated_url(self, novel_page_url: str) -> Union[str, None]:
