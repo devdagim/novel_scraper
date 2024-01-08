@@ -151,7 +151,7 @@ class NovelScraper:
 
         self._get_novel_name()
         novel_name = self.scraper_items.novel_name
-        novel_name = novel_name.encode('utf-8', 'replace').decode('utf-8')
+        novel_name = novel_name.encode('utf-8')
         print(">>(info):","novel name extracted:",novel_name)
         if not novel_name:
             raise NovelNameError(
