@@ -1,8 +1,4 @@
 from src.novel_scraper import NovelScraper
-import logging
-
-logging.basicConfig(level=logging.INFO)
-
 
 
 
