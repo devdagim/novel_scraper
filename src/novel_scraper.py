@@ -18,7 +18,7 @@ from fake_useragent import FakeUserAgent
 from googletrans import Translator
 
 # Local Imports
-from src.novel_scraper_exception import (
+from src.scraper_expectation import (
     EmptyChapterListError,
     NovelNameError,
     NovelPageLoadError,
