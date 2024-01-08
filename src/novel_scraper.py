@@ -10,7 +10,6 @@ import re
 import os
 import sys
 
-sys.setdefaultencoding('utf-8')
 
 # Third-Party Library Imports
 import pytesseract
