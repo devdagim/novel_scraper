@@ -247,7 +247,6 @@ class NovelScraper:
 
         parsed_url = urlparse(novel_page_url)
         url_params = parsed_url.path.split("/")
-        print("url_params", url_params)
 
         params = {
             'ngmar': 'chapterlist',
@@ -262,21 +261,20 @@ class NovelScraper:
                 print(">>(info): retrying:",retry,"times to get chapters id list from the api")
 
             response = self.page.request.get(api_url, params=params, headers=headers,timeout=210000)
-            print(response.status)
-            print(response.body())
-            json_res = response.json()
-
-            server_res_code = json_res.get("code")
-            chapters_id_data = json_res.get("data")
-
-            if server_res_code == 1 and chapters_id_data:
-                chapters_id = re.findall(r"1-/-(\d+)-/-", chapters_id_data)
-                chapter_id_list = [
-                    int(chapter_id) for chapter_id in chapters_id
-                ]
-
-                self.chapters_id = sorted(chapter_id_list)
-                return 1
+            if response.status == 200 and response.body() is not None:
+                json_res = response.json()
+    
+                server_res_code = json_res.get("code")
+                chapters_id_data = json_res.get("data")
+    
+                if server_res_code == 1 and chapters_id_data:
+                    chapters_id = re.findall(r"1-/-(\d+)-/-", chapters_id_data)
+                    chapter_id_list = [
+                        int(chapter_id) for chapter_id in chapters_id
+                    ]
+    
+                    self.chapters_id = sorted(chapter_id_list)
+                    return 1
             retry += 1
 
     def _get_novel_name(self) -> str:
