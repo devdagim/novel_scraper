@@ -195,8 +195,8 @@ class NovelScraper:
             chapter_page = f"{novel_page_url}{chapter_id_list[chapter_num]}/"
             self.page.goto(chapter_page, wait_until="load", timeout=210000)
 
-            self.page.wait_for_selector("#content-container .contentbox",timeout=210000)
-            while True:
+            is_spinning = self.page.query_selector(".spinner-border")
+            while is_spinning:
                 self.page.locator("html").click(timeout=210000)
                 self.page.wait_for_load_state("networkidle", timeout=210000)
                 num_of_opened_pages = len(self.page.context.pages)
@@ -205,8 +205,6 @@ class NovelScraper:
                         self.page.context.pages[i].close()
                 sleep(1)
                 is_spinning = self.page.query_selector(".spinner-border")
-                if not is_spinning:
-                    break
 
             chapter_content_box = self.page.locator("#content-container .contentbox")
 
