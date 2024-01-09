@@ -365,7 +365,7 @@ class NovelScraper:
                 print(f">>(warning): retrying {retry} times to translates: {text[:150]}")
 
             try:
-                translations = translator.translate(text, src="vi", dest="en")
+                translations = translator.translate(text, dest="en")
                 translated_text = translations.text
                 return translated_text
             except Exception as e:
