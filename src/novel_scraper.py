@@ -333,7 +333,7 @@ class NovelScraper:
                 translated_text = translations.text
                 return translated_text
             except Exception as e:
-                print(f">>(warning): {_} retrying to translates: {text}")
+                print(f">>(warning): {_} retrying to translates: {text[:49]}")
             sleep(1)
 
         print(">>(warning): Exceeded maximum translation retries. Unable to translate.")
