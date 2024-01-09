@@ -2,9 +2,9 @@ from src.novel_scraper import NovelScraper
 
 scraper = NovelScraper()
 
-novel_page_url = input("novel page url: ")
-starting_chapter = input("starting chapter to scrap: ")
-download_folder_path = input("Download Folder Path: ")
+novel_page_url = "https://sangtacviet.vip/truyen/faloo/1/1378270/"#input("novel page url: ")
+starting_chapter = 1#input("starting chapter to scrap: ")
+download_folder_path = "download"#input("Download Folder Path: ")
 
 
 if __name__ == "__main__":
