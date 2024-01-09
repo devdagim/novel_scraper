@@ -1,9 +1,10 @@
 import sys
-sys.stdout.reconfigure(encoding='utf-8')
+
+sys.stdout.reconfigure(encoding="utf-8")
 
 # Standard Library Imports
 from time import sleep
-from typing import Union,List,AnyStr
+from typing import Union, List
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
@@ -12,10 +13,9 @@ import re
 import os
 
 
-
 # Third-Party Library Imports
 import pytesseract
-from playwright.sync_api import sync_playwright, Route, Response
+from playwright.sync_api import sync_playwright, Route, Response, TimeoutError
 from PIL import Image
 from fake_useragent import FakeUserAgent
 from googletrans import Translator
@@ -23,9 +23,12 @@ from googletrans import Translator
 # Local Imports
 from src.scraper_expectation import (
     EmptyChapterListError,
-    NovelNameError,
+    NovelNameExtractingError,
     NovelPageLoadError,
     TranslationError,
+    InvalidNovelPageUrl,
+    InvalidDownloadPath,
+    InvalidStartingChapter,
 )
 
 
@@ -45,19 +48,17 @@ class NovelScraper:
 
     def _start_playwright(self) -> None:
         """Starts the Playwright."""
-        print(">>(info):","Starting playwright")
+        print(">>(info):", "Starting playwright")
         self.playwright = sync_playwright().start()
 
     def _launch_browser(self) -> None:
         """Launches the headless chromium browser."""
-        print(">>(info):","Launching headless chromium browser")
-        self.browser = self.playwright.chromium.launch(
-            headless=True, slow_mo=21
-        )
+        print(">>(info):", "Launching headless chromium browser")
+        self.browser = self.playwright.chromium.launch(headless=True, slow_mo=21)
 
     def _initialize_page(self) -> None:
         """Initializes a new page in the browser."""
-        print(">>(info):","Initializing new page")
+        print(">>(info):", "Initializing new page")
         user_agent = FakeUserAgent().random
         context = self.browser.new_context(user_agent=user_agent)
         self._add_lang_cookie(context)
@@ -118,39 +119,46 @@ class NovelScraper:
 
     def _close_browser(self) -> None:
         """Closes the browser."""
-        print(">>(info):","Closing the browser")
+        print(">>(info):", "Closing the browser")
         self.browser.close()
 
     def _stop_playwright(self) -> None:
         """Stops the Playwright."""
-        print(">>(info):","Stopping Playwright")
+        print(">>(info):", "Stopping Playwright")
         self.playwright.stop()
 
     # Novel Page Methods
 
-    def _scrape_novel_page(
-        self, novel_page_url: str, download_folder_path: str
-    ):
+    def _scrape_novel_page(self, novel_page_url: str, download_folder_path: str):
         """Scrapes information from the novel page."""
         novel_page_url = self._validated_url(novel_page_url)
+        if not novel_page_url:
+            raise InvalidNovelPageUrl
 
+        self.page.on("response", self._get_chapter_list)
+        print(">>(info):", "loading novel page url:", novel_page_url)
 
-        self.page.on("response",self._get_chapter_list)
-        print(">>(info):","loading novel page url:",novel_page_url)
-        self.page.goto(novel_page_url,wait_until="load",timeout=24000)
-
-        novel_name = self._get_novget_novel_name()
-        print(">>(info):","novel name extracted:",novel_name)
-        if not novel_name:
-            raise NovelNameError(
-                "Novel name is null. Unable to extract the novel name"
+        try:
+            page_res = self.page.goto(novel_page_url, wait_until="load", timeout=36000)
+            if page_res.status != 200:
+                raise NovelPageLoadError(
+                    f"Error: unable to load the novel page,please check the url by opening on browser. got_to:{novel_page_url}"
+                )
+        except TimeoutError:
+            raise NovelPageLoadError(
+                "Error loading novel page. The loading time exceeded the timeout limit. Please try agin or check your internet connection."
             )
 
+        novel_name = self._get_novel_name()
+        print(">>(info):", "novel name extracted:", novel_name)
+        if not novel_name:
+            raise NovelNameExtractingError
+
         novel_name_in_eng = self._translate(novel_name)
-        print(">>(info):","novel name in eng:",novel_name_in_eng)
+        print(">>(info):", "novel name in eng:", novel_name_in_eng)
         if not novel_name_in_eng:
             raise TranslationError(
-                f"Failed to translate novel name: {novel_name}. The translation result is empty."
+                f"Error: Failed to translate the novel name: {novel_name}. The translation api response is empty."
             )
 
         print(">>(info): chapters_id:", self.chapters_id)
@@ -160,9 +168,10 @@ class NovelScraper:
             )
 
         download_path = self._validate_download_path(download_folder_path)
-        novel_folder_path = self._create_novel_folder(
-            download_path, novel_name_in_eng
-        )
+        if not download_path:
+            raise InvalidDownloadPath
+
+        novel_folder_path = self._create_novel_folder(download_path, novel_name_in_eng)
 
         print(">>(info): novel folder created:", novel_folder_path)
         self.novel_folder_path = novel_folder_path
@@ -171,9 +180,11 @@ class NovelScraper:
         """Scrapes content from each chapter page."""
         chapter_id_list = self.chapters_id
         starting_chapter = self._validated_starting_chapter(starting_chapter)
+        if not starting_chapter:
+            raise InvalidStartingChapter
 
         for chapter_num in range(starting_chapter, len(chapter_id_list)):
-            print(">>(info): scraping chapter:", chapter_num+1)
+            print(">>(info): scraping chapter:", chapter_num + 1)
             chapter_page = f"{novel_page_url}{chapter_id_list[chapter_num]}/"
             self.page.goto(chapter_page, wait_until="domcontentloaded")
 
@@ -189,16 +200,12 @@ class NovelScraper:
                 if not is_spinning:
                     break
 
-            chapter_content_box = self.page.locator(
-                "#content-container .contentbox"
-            )
+            chapter_content_box = self.page.locator("#content-container .contentbox")
 
             self._remove_ads()
-            print(">>(info): taking screenshot of chapter:", chapter_num+1)
+            print(">>(info): taking screenshot of chapter:", chapter_num + 1)
             chapter_content_bytes = chapter_content_box.screenshot()
-            chapter_content_txt = self._extract_chapter_content(
-                chapter_content_bytes
-            )
+            chapter_content_txt = self._extract_chapter_content(chapter_content_bytes)
 
             self._save_chapter(chapter_num, str(chapter_content_txt))
             sleep(0.7)
@@ -215,11 +222,12 @@ class NovelScraper:
             self._launch_browser()
             self._initialize_page()
             self._scrape_novel_page(novel_page_url, download_folder_path)
-            self._scrape_chapter_page(novel_page_url, starting_chapter)
+            self._scrape_chapter_page(novel_page_url, int(starting_chapter))
             self._close_browser()
 
         except Exception as e:
-            raise e
+            print(">>(Error): Errors Occurred during scraping")
+            print(">>(Error_Message):", e)
 
         finally:
             self._stop_playwright()
@@ -235,9 +243,7 @@ class NovelScraper:
             if code == 1 and data:
                 chapters_un_data = json_res["data"]
                 chapters_id = re.findall(r"1-/-(\d+)-/-", chapters_un_data)
-                chapter_id_list = [
-                    int(chapter_id) for chapter_id in chapters_id
-                ]
+                chapter_id_list = [int(chapter_id) for chapter_id in chapters_id]
 
                 self.chapters_id = sorted(chapter_id_list)
 
@@ -251,32 +257,22 @@ class NovelScraper:
         """Validates and formats the novel page URL."""
         url = novel_page_url
 
-        while True:
-            try:
-                parse_result = urlparse(url)
-                path_pattern = re.compile(r"/(\d+)/?$")
-                is_valid_path = bool(
-                    re.search(path_pattern, parse_result.path)
-                )
+        parse_result = urlparse(url)
+        path_pattern = re.compile(r"/(\d+)/?$")
+        is_valid_path = bool(re.search(path_pattern, parse_result.path))
 
-                if (
-                    (parse_result.scheme in ["http", "https"])
-                    and (parse_result.netloc == "sangtacviet.vip")
-                    and is_valid_path
-                ):
-                    if parse_result.path.endswith("/"):
-                        return url
-                    else:
-                        return f"{url}/"
-                else:
-                    url = input("Please enter the correct novel page URL: ")
+        if (
+            (parse_result.scheme in ["http", "https"])
+            and (parse_result.netloc == "sangtacviet.vip")
+            and is_valid_path
+        ):
+            if parse_result.path.endswith("/"):
+                return url
+            else:
+                return f"{url}/"
+        return None
 
-            except (TypeError, ValueError):
-                url = input("Please enter the correct novel page URL: ")
-
-    def _validated_starting_chapter(
-        self, starting_chapter: int
-    ) -> Union[int, None]:
+    def _validated_starting_chapter(self, starting_chapter: int) -> Union[int, None]:
         """Validates the starting chapter index."""
         while True:
             total_chapter = len(self.chapters_id)
@@ -287,9 +283,7 @@ class NovelScraper:
                     f"Error: The starting chapter must be in range between [1-{total_chapter}].\n"
                 )
                 starting_chapter = int(
-                    input(
-                        f"Please enter the correct one [1-{total_chapter}]: "
-                    )
+                    input(f"Please enter the correct one [1-{total_chapter}]: ")
                 )
                 starting_chapter = starting_chapter - 1
             else:
@@ -312,32 +306,26 @@ class NovelScraper:
             )
             return "removed"
 
-    def _validate_download_path(
-        self, download_path: str = None
-    ) -> Union[str, None]:
+    def _validate_download_path(self, download_path: str = None) -> Union[str, None]:
         """Validates and formats the download folder path."""
         download_path = str(download_path).strip()
 
-        while True:
-            is_dir = os.path.isdir(download_path)
+        is_dir = os.path.isdir(download_path)
+        if is_dir:
+            is_abs_path = os.path.isabs(download_path)
 
-            if is_dir:
-                is_abs_path = os.path.isabs(download_path)
-
-                if is_abs_path:
-                    return download_path
-                else:
-                    return os.path.abspath(download_path)
+            if is_abs_path:
+                return download_path
             else:
-                download_path = input(
-                    "Please enter the correct Path of Download Folder: "
-                )
-                download_path = str(download_path).strip()
+                return os.path.abspath(download_path)
+        return None
 
     def _create_novel_folder(self, download_path, novel_name) -> str:
         """Creates a folder for the novel."""
         # Replace invalid characters with underscores
-        sanitized_novel_name = ''.join(c if c.isalnum() or c in (' ', '-') else '_' for c in novel_name.strip())
+        sanitized_novel_name = "".join(
+            c if c.isalnum() or c in (" ", "-") else "_" for c in novel_name.strip()
+        )
 
         novel_folder_path = os.path.join(download_path, sanitized_novel_name[:250])
         if not os.path.exists(novel_folder_path):
@@ -360,7 +348,9 @@ class NovelScraper:
     def _extract_chapter_content(self, chapter_content_bytes):
         """Extracts chapter content from the screenshot."""
         image = Image.open(io.BytesIO(chapter_content_bytes))
-        pytesseract.pytesseract.tesseract_cmd = f'{os.getcwd()}/build/tesseract_ocr/tesseract.exe'
+        pytesseract.pytesseract.tesseract_cmd = (
+            f"{os.getcwd()}/build/tesseract_ocr/tesseract.exe"
+        )
         chapter_content = pytesseract.image_to_string(image, lang="vie")
 
         return chapter_content
@@ -368,9 +358,7 @@ class NovelScraper:
     def _save_chapter(self, chapter_num: int, chapter_content: str) -> bool:
         """Saves the translated chapter content to a file."""
         novel_folder_path = self.novel_folder_path
-        chapter_txt_path = os.path.join(
-            novel_folder_path, f"{chapter_num+1}.txt"
-        )
+        chapter_txt_path = os.path.join(novel_folder_path, f"{chapter_num+1}.txt")
 
         chunk_size = len(chapter_content) // 3
         paragraphs = [
@@ -382,9 +370,19 @@ class NovelScraper:
         for p in paragraphs:
             p = str(p).strip()
             if p:
-                print(">>(info): paragraph of chapter:",chapter_num+1," before translate:",p)
+                print(
+                    ">>(info): paragraph of chapter:",
+                    chapter_num + 1,
+                    " before translate:",
+                    p,
+                )
                 translation_result = self._translate(p)
-                print(">>(info): paragraph of chapter:",chapter_num+1," after translate:",translation_result)
+                print(
+                    ">>(info): paragraph of chapter:",
+                    chapter_num + 1,
+                    " after translate:",
+                    translation_result,
+                )
 
             if translation_result is not None:
                 translated_chapter += translation_result + "\n"
@@ -392,14 +390,13 @@ class NovelScraper:
                 pass
 
         if not translated_chapter:
-            logging.error(
-                f"Unable to translate chapter {chapter_num} content; saved as it is."
+            print(
+                f"(waring): Unable to translate chapter {chapter_num} content; saved as it is."
             )
 
         try:
             with open(chapter_txt_path, "w", encoding="utf-8") as file:
                 file.write(translated_chapter)
-            print(">>(info): chapter:",chapter_num+1,"saved to:",chapter_txt_path)
+            print(">>(info): chapter:", chapter_num + 1, "saved to:", chapter_txt_path)
         except Exception as e:
-            logging.error(f"Error saving chapter {chapter_num} to file: {e}")
-            return False
+            print(f"(waring): unable to save chapter {chapter_num} to file. Error: {e}")

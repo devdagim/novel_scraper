@@ -1,8 +1,8 @@
 class NovelPageLoadError(Exception):
-   def __init__(self, message=None):
-        self.message = "Error during loading the novel page. Please try again or \
-            check the novel page URL by opening it in a web browser."
+    def __init__(self, message):
+        self.message = message
         super().__init__(message)
+
 
 class NovelNameExtractingError(Exception):
     def __init__(self, message=None):
@@ -18,7 +18,24 @@ class EmptyChapterListError(Exception):
 
 
 class TranslationError(Exception):
-    pass
+    def __init__(self, message):
+        self.message = message
+        super().__init__(message)
 
-class SavingFileError(Exception):
-    pass
+
+class InvalidNovelPageUrl(Exception):
+    def __init__(self, message=None):
+        self.message = "Invalid Novel Page URL. Please ensure the provided URL is correct and try again."
+        super().__init__(message)
+
+
+class InvalidDownloadPath(Exception):
+    def __init__(self, message=None):
+        self.message = "Invalid Novel Download Path. Please enter the correct Path of Download Folder."
+        super().__init__(message)
+
+
+class InvalidStartingChapter(Exception):
+    def __init__(self, message=None):
+        self.message = "Invalid Starting Chapter. Please enter the correct Starting of the Chapter that you want to scrape."
+        super().__init__(message)
