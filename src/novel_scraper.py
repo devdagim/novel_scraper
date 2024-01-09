@@ -12,9 +12,9 @@ import sys
 
 # Set UTF-8 as the global output encoder
 # os.device_encoding()
-os.environ["PYTHONUTF8"] = str(1)
+# os.environ["PYTHONUTF8"] = str(1)
 
-print("-----------test encoding: ", sys.stdout.encoding)
+# print("-----------test encoding: ", sys.stdout.encoding)
 
 # Third-Party Library Imports
 import pytesseract
@@ -258,7 +258,9 @@ class NovelScraper:
         novel_name = self.page.locator("h1#book_name2").text_content()
 
         # sys.stdout.buffer.write(novel_name.encode("utf-8"))
-        print("---------",novel_name)
+        import unicodedata
+        novel_name = unicodedata.normalize('NFKD', novel_name).encode('utf-8', 'ignore')
+        print("---------",f"{novel_name}")
 
         return novel_name
 
