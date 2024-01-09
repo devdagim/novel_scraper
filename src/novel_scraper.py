@@ -259,7 +259,7 @@ class NovelScraper:
 
         # sys.stdout.buffer.write(novel_name.encode("utf-8"))
         
-        print("---------",novel_name.encode("utf-8"))
+        print("---------",novel_name.encode("cp1258","replace").decode("cp1258","replace"))
 
         return novel_name
 
