@@ -11,10 +11,10 @@ import os
 import sys
 
 # Set UTF-8 as the global output encoder
-os.device_encoding()
-os.environ["PYTHONUTF8OUTPUT"] = "1"
+# os.device_encoding()
+# os.environ["PYTHONUTF8OUTPUT"] = "1"
 
-print("-----------test encoding: ", sys.stdout.encoding)
+# print("-----------test encoding: ", sys.stdout.encoding)
 
 # Third-Party Library Imports
 import pytesseract
