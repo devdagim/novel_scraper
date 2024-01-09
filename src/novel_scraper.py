@@ -12,7 +12,7 @@ import sys
 
 # Set UTF-8 as the global output encoder
 # os.device_encoding()
-os.environ["PYTHONUTF8"] = 1
+os.environ["PYTHONUTF8"] = str(1)
 
 print("-----------test encoding: ", sys.stdout.encoding)
 
