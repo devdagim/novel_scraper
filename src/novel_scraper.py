@@ -54,7 +54,7 @@ class NovelScraper:
     def _launch_browser(self) -> None:
         """Launches the headless chromium browser."""
         print(">>(info):", "Launching headless chromium browser")
-        self.browser = self.playwright.chromium.launch(headless=True, slow_mo=21)
+        self.browser = self.playwright.chromium.launch(headless=True, slow_mo=50)
 
     def _initialize_page(self) -> None:
         """Initializes a new page in the browser."""
@@ -107,7 +107,7 @@ class NovelScraper:
             "google",
             "google-analytics",
             "googletagmanager",
-            "woafoame",
+            "woafoame.net",
         ]
 
         if route.request.resource_type in BLOCK_RESOURCE_TYPES:
