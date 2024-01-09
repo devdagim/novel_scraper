@@ -37,3 +37,25 @@ on the last, install the Playwright browser automation framework dependency:
 ```bash
 playwright install
 ```
+
+
+## Running Guide
+Run the scraper script
+
+To start scraping, run the following command:
+```bash
+python main.py
+```
+
+Input the following parameters when prompted:
+
+`novel_page_url`: The URL of the novel page you want to scrape.<br>
+`starting_chapter`: The starting chapter number for scraping. If it's the first time, set it to 1. If there was a previous failure, set it to the last successfully scraped chapter.<br>
+`download_folder_path`: Enter the download folder path. If it's the first time, use "download". If there was a previous failure, specify the folder path within the "download" directory where the failed scraping occurred.<br>
+For example, if you want to continue scraping from where it left off due to a network error:
+
+`novel_page_url`: [URL]<br>
+`starting_chapter`: [last successfully scraped chapter] or 1<br>
+`download_folder_path`: "download/novel_page_folder" or "download"<br>
+<br><br>
+Feel free to contact me if you have any questions or issues. Happy scraping!
