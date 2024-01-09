@@ -1,3 +1,6 @@
+import sys
+sys.stdout.reconfigure(encoding='utf-8')
+
 # Standard Library Imports
 from time import sleep
 from typing import Union,List,AnyStr
@@ -5,18 +8,10 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
 import io
-import logging
 import re
 import os
-import sys
 
-sys.stdout.reconfigure(encoding='utf-8')
 
-# Set UTF-8 as the global output encoder
-# os.device_encoding()
-# os.environ["PYTHONUTF8"] = str(1)
-
-# print("-----------test encoding: ", sys.stdout.encoding)
 
 # Third-Party Library Imports
 import pytesseract
@@ -32,12 +27,6 @@ from src.scraper_expectation import (
     NovelPageLoadError,
     TranslationError,
 )
-
-
-
-# ANSI escape codes for color
-RED = "\033[91m"
-RESET = "\033[0m"
 
 
 class NovelScraper:
@@ -150,7 +139,6 @@ class NovelScraper:
         print(">>(info):","loading novel page url:",novel_page_url)
         self.page.goto(novel_page_url,wait_until="load",timeout=24000)
 
-        
         novel_name = self._get_novel_name()
         print(">>(info):","novel name extracted:",novel_name)
         if not novel_name:
@@ -158,7 +146,6 @@ class NovelScraper:
                 "Novel name is null. Unable to extract the novel name"
             )
 
-        print(">>------------------test: ",novel_name)
         novel_name_in_eng = self._translate(novel_name)
         print(">>(info):","novel name in eng:",novel_name_in_eng)
         if not novel_name_in_eng:
@@ -232,7 +219,6 @@ class NovelScraper:
             self._close_browser()
 
         except Exception as e:
-            logging.critical(f"Error during scraping: {e}")
             raise e
 
         finally:
@@ -258,11 +244,6 @@ class NovelScraper:
     def _get_novel_name(self) -> str:
         """Extracts the novel name from the page."""
         novel_name = self.page.locator("h1#book_name2").text_content()
-
-        # sys.stdout.buffer.write(novel_name.encode("utf-8"))
-        # Try changing the default encoding to UTF-8
-        
-        print("---------",novel_name.encode("utf-8","replace").decode("utf-8","replace"))
 
         return novel_name
 
@@ -368,23 +349,21 @@ class NovelScraper:
         """Translates text to English."""
         translator = Translator()
 
-        # try:
-        translations = translator.translate(text, src="vi", dest="en")
-        translated_text = translations.text
-        return translated_text
-        # except Exception as e:
-        #     logging.error(f"Translation error: {e}")
-        #     return None
+        try:
+            translations = translator.translate(text, src="vi", dest="en")
+            translated_text = translations.text
+            return translated_text
+        except Exception as e:
+            logging.error(f"Translation error: {e}")
+            return None
 
     def _extract_chapter_content(self, chapter_content_bytes):
         """Extracts chapter content from the screenshot."""
         image = Image.open(io.BytesIO(chapter_content_bytes))
-        pytesseract.pytesseract.tesseract_cmd = r'build/tesseract_ocr/tesseract.exe'
+        pytesseract.pytesseract.tesseract_cmd = f'{os.getcwd()}/build/tesseract_ocr/tesseract.exe'
         chapter_content = pytesseract.image_to_string(image, lang="vie")
 
-        chapter_content_txt = sys.stdout.buffer.write(chapter_content.encode('utf8'))
-
-        return chapter_content_txt
+        return chapter_content
 
     def _save_chapter(self, chapter_num: int, chapter_content: str) -> bool:
         """Saves the translated chapter content to a file."""
