@@ -185,6 +185,7 @@ class NovelScraper:
 
         for chapter_num in range(starting_chapter, len(chapter_id_list)):
             print(">>(info): scraping chapter:", chapter_num + 1)
+            print(">>(info): remaining chapter:", len(chapter_id_list) - chapter_num)
             chapter_page = f"{novel_page_url}{chapter_id_list[chapter_num]}/"
             self.page.goto(chapter_page, wait_until="domcontentloaded")
 
@@ -203,7 +204,7 @@ class NovelScraper:
             chapter_content_box = self.page.locator("#content-container .contentbox")
 
             self._remove_ads()
-            print(">>(info): taking screenshot of chapter:", chapter_num + 1)
+            print(">>(info): taking the screenshot of chapter:", chapter_num + 1)
             chapter_content_bytes = chapter_content_box.screenshot()
             chapter_content_txt = self._extract_chapter_content(chapter_content_bytes)
 
@@ -292,10 +293,7 @@ class NovelScraper:
     def _remove_ads(self):
         """Removes ads from the page."""
         iframes = self.page.query_selector_all("iframe")
-        print(">> iframes:", iframes)
         if iframes:
-            print(">> iframes:", iframes)
-
             self.page.evaluate(
                 """
                 var iframes = document.querySelectorAll('iframe');
@@ -342,7 +340,7 @@ class NovelScraper:
             translated_text = translations.text
             return translated_text
         except Exception as e:
-            logging.error(f"Translation error: {e}")
+            print(f">>(waring): translation api waring: {e}")
             return None
 
     def _extract_chapter_content(self, chapter_content_bytes):
@@ -374,14 +372,16 @@ class NovelScraper:
                     ">>(info): paragraph of chapter:",
                     chapter_num + 1,
                     " before translate:",
-                    p,
+                    p[:49],
+                    "...."
                 )
                 translation_result = self._translate(p)
                 print(
                     ">>(info): paragraph of chapter:",
                     chapter_num + 1,
                     " after translate:",
-                    translation_result,
+                    translation_result[:49],
+                    "...."
                 )
 
             if translation_result is not None:
