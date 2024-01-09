@@ -132,7 +132,7 @@ class NovelScraper:
     def _scrape_novel_page(self, novel_page_url: str, download_folder_path: str):
         """Scrapes information from the novel page."""
         novel_page_url = self._validated_url(novel_page_url)
-        if not novel_page_url:
+        if novel_page_url is None:
             raise InvalidNovelPageUrl
 
         self.page.on("response", self._get_chapter_list)
@@ -151,7 +151,7 @@ class NovelScraper:
 
         novel_name = self._get_novel_name()
         print(">>(info):", "novel name extracted:", novel_name)
-        if not novel_name:
+        if novel_name is None:
             raise NovelNameExtractingError
 
         novel_name_in_eng = self._translate(novel_name)
@@ -180,7 +180,7 @@ class NovelScraper:
         """Scrapes content from each chapter page."""
         chapter_id_list = self.chapters_id
         starting_chapter = self._validated_starting_chapter(starting_chapter)
-        if not starting_chapter:
+        if starting_chapter is None:
             raise InvalidStartingChapter
 
         for chapter_num in range(starting_chapter, len(chapter_id_list)):
@@ -275,10 +275,8 @@ class NovelScraper:
 
     def _validated_starting_chapter(self, starting_chapter: int) -> Union[int, None]:
         """Validates the starting chapter index."""
-        print("----test-log:",starting_chapter)
         total_chapter = len(self.chapters_id)
         starting_chapter = starting_chapter - 1
-        print("----test-log:",starting_chapter)
 
         if starting_chapter > -1 and starting_chapter <= total_chapter:
             return starting_chapter
