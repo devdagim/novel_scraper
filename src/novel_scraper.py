@@ -139,7 +139,7 @@ class NovelScraper:
         print(">>(info):","loading novel page url:",novel_page_url)
         self.page.goto(novel_page_url,wait_until="load",timeout=24000)
 
-        novel_name = self._get_novel_name()
+        novel_name = self._get_novget_novel_name()
         print(">>(info):","novel name extracted:",novel_name)
         if not novel_name:
             raise NovelNameError(
