@@ -184,13 +184,15 @@ class NovelScraper:
 
         for chapter_num in range(starting_chapter, len(chapter_id_list)):
             print(">>(info): scraping chapter:", chapter_num + 1)
-            print(">>(info): remaining chapter:", len(chapter_id_list) - chapter_num-1)
+            print(
+                ">>(info): remaining chapter:", len(chapter_id_list) - chapter_num - 1
+            )
             chapter_page = f"{novel_page_url}{chapter_id_list[chapter_num]}/"
-            self.page.goto(chapter_page, wait_until="load",timeout=210000)
+            self.page.goto(chapter_page, wait_until="load", timeout=210000)
 
             while True:
                 self.page.locator("html").click(timeout=210000)
-                self.page.wait_for_load_state("networkidle",timeout=210000)
+                self.page.wait_for_load_state("networkidle", timeout=210000)
                 num_of_opened_pages = len(self.page.context.pages)
                 if num_of_opened_pages > 1:
                     for i in range(1, num_of_opened_pages):
