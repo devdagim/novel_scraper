@@ -134,9 +134,8 @@ class NovelScraper:
         if novel_page_url is None:
             raise InvalidNovelPageUrl
 
-        self.page.on("response", self._get_chapter_list)
-        print(">>(info):", "loading novel page url:", novel_page_url)
 
+        print(">>(info):", "loading novel page url:", novel_page_url)
         try:
             page_res = self.page.goto(novel_page_url, wait_until="load", timeout=210000)
             if page_res.status != 200:
@@ -148,23 +147,27 @@ class NovelScraper:
                 "Error loading novel page. The loading time exceeded the timeout limit. Please try agin or check your internet connection."
             )
 
+        
+        print(">>(info): extracting chapters id from the novel page")
+        self._get_chapter_list(novel_page_url)
+        
         novel_name = self._get_novel_name()
-        print(">>(info):", "novel name extracted:", novel_name)
         if novel_name is None:
             raise NovelNameExtractingError
+        print(">>(info):", "novel name extracted:", novel_name)
 
         novel_name_in_eng = self._translate(novel_name)
-        print(">>(info):", "novel name in eng:", novel_name_in_eng)
         if not novel_name_in_eng:
             raise TranslationError(
                 f"Error: Failed to translate the novel name: {novel_name}. The translation api response is empty."
             )
+        print(">>(info):", "novel name in eng:", novel_name_in_eng)
 
-        print(">>(info): chapters_id:", self.chapters_id)
         if not self.chapters_id:
             raise EmptyChapterListError(
                 "Failed to retrieve the chapter list. The list is empty."
             )
+        print(">>(info): chapters_id:", self.chapters_id)
 
         download_path = self._validate_download_path(download_folder_path)
         if not download_path:
@@ -234,20 +237,47 @@ class NovelScraper:
         finally:
             self._stop_playwright()
 
-    def _get_chapter_list(self, res: Response):
-        """Extracts chapter list from the response."""
-        if "sajax=getchapterlist" in res.url and res.status == 200:
-            json_res = res.json()
+    def _get_chapter_list(self, novel_page_url):
+        """get the chaptes list from api methood"""
+        api_url = "https://sangtacviet.vip/index.php"
+        headers = {
+            'authority': 'sangtacviet.vip',
+            'referer': novel_page_url,
+        }
 
-            code = json_res.get("code")
-            data = json_res.get("data")
+        parsed_url = urlparse(novel_page_url)
+        url_params = parsed_url.path.split("/")
+        print("url_params", url_params)
 
-            if code == 1 and data:
-                chapters_un_data = json_res["data"]
-                chapters_id = re.findall(r"1-/-(\d+)-/-", chapters_un_data)
-                chapter_id_list = [int(chapter_id) for chapter_id in chapters_id]
+        params = {
+            'ngmar': 'chapterlist',
+            'h': url_params[2], #book-category
+            'bookid': url_params[4], # book-id
+            'sajax': 'getchapterlist',
+        }
+
+        retry = 1
+        while True:
+            if retry > 1:
+                print(">>(info): retrying:",retry,"times to get chapters id list from the api")
+
+            response = self.page.request.get(api_url, params=params, headers=headers,timeout=210000)
+            print(response.status)
+            print(response.body())
+            json_res = response.json()
+
+            server_res_code = json_res.get("code")
+            chapters_id_data = json_res.get("data")
+
+            if server_res_code == 1 and chapters_id_data:
+                chapters_id = re.findall(r"1-/-(\d+)-/-", chapters_id_data)
+                chapter_id_list = [
+                    int(chapter_id) for chapter_id in chapters_id
+                ]
 
                 self.chapters_id = sorted(chapter_id_list)
+                return 1
+            retry += 1
 
     def _get_novel_name(self) -> str:
         """Extracts the novel name from the page."""
