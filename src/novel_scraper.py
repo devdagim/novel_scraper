@@ -375,7 +375,7 @@ class NovelScraper:
     def _extract_chapter_content(self, chapter_content_bytes):
         """Extracts chapter content from the screenshot."""
         image = Image.open(io.BytesIO(chapter_content_bytes))
-        pytesseract.pytesseract.tesseract_cmd = r'/workspaces/novel_scraper/build/tesseract_ocr'
+        pytesseract.pytesseract.tesseract_cmd = r'build/tesseract_ocr/tesseract.exe'
         chapter_content_txt = pytesseract.image_to_string(image, lang="vie")
 
         return chapter_content_txt
