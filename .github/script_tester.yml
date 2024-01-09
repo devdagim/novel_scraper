@@ -1,11 +1,11 @@
 name: Novel scraper testser for window
 
-on:
-  push
+on: [push]
 
 jobs:
   test_script:
     runs-on: windows-latest
+    if: "contains(github.event.head_commit.message, 'test')"
 
     steps:
       - uses: actions/checkout@v4
