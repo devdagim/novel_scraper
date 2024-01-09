@@ -256,7 +256,7 @@ class NovelScraper:
     def _get_novel_name(self) -> str:
         """Extracts the novel name from the page."""
         novel_name = self.page.locator("h1#book_name2").text_content()
-        novel_name = novel_name.encode("cp1252", "replace").decode("cp1252", "replace")
+
         # sys.stdout.buffer.write(novel_name.encode("utf-8"))
         print("---------",novel_name)
 
