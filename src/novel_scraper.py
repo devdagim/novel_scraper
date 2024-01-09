@@ -359,17 +359,19 @@ class NovelScraper:
         """Translates text to English."""
         translator = Translator()
 
-        for _ in range(7):
+        retry=1
+        while True:
+            if retry > 1:
+                print(f">>(warning): retrying {retry} times to translates: {text[:150]}")
+
             try:
                 translations = translator.translate(text, src="vi", dest="en")
                 translated_text = translations.text
                 return translated_text
             except Exception as e:
-                print(f">>(warning): {_} retrying to translates: {text[:62]}")
-            sleep(1)
-
-        print(">>(warning): Exceeded maximum translation retries. Unable to translate.")
-        return None
+                pass
+            retry += 1
+            sleep(uniform(1.1,2.2))
 
     def _extract_chapter_content(self, chapter_content_bytes):
         """Extracts chapter content from the screenshot."""
@@ -387,7 +389,7 @@ class NovelScraper:
             ">>(info): chapter:",
             chapter_num + 1,
             " before translate:",
-            chapter_content[:62],
+            chapter_content[:150],
             "....",
         )
 
@@ -420,7 +422,7 @@ class NovelScraper:
                 ">>(info): chapter:",
                 chapter_num + 1,
                 " after translate:",
-                translated_chapter[:62],
+                translated_chapter[:150],
                 "....",
             )
 
