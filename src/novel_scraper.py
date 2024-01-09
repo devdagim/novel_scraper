@@ -327,13 +327,17 @@ class NovelScraper:
         """Translates text to English."""
         translator = Translator()
 
-        try:
-            translations = translator.translate(text, src="vi", dest="en")
-            translated_text = translations.text
-            return translated_text
-        except Exception as e:
-            print(f">>(waring): translation api waring: {e}")
-            return None
+        for _ in range(7):
+            try:
+                translations = translator.translate(text, src="vi", dest="en")
+                translated_text = translations.text
+                return translated_text
+            except Exception as e:
+                print(f">>(warning): {_} retrying to translates: {text}")
+            sleep(1)
+
+        print(">>(warning): Exceeded maximum translation retries. Unable to translate.")
+        return None
 
     def _extract_chapter_content(self, chapter_content_bytes):
         """Extracts chapter content from the screenshot."""
