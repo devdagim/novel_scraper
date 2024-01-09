@@ -259,7 +259,7 @@ class NovelScraper:
 
         # sys.stdout.buffer.write(novel_name.encode("utf-8"))
         import unicodedata
-        novel_name = unicodedata.normalize('NFKD', novel_name).encode('utf-8', 'ignore')
+        novel_name = unicodedata.normalize('NFKD', novel_name).encode('utf-8', 'ignore').decode()
         print("---------",f"{novel_name}")
 
         return novel_name
