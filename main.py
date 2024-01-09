@@ -2,7 +2,7 @@ from src.novel_scraper import NovelScraper
 
 scraper = NovelScraper()
 
-novel_page_url = "https://sangtacviet.vip/truyen/sangtac/1/17488/"#input("novel page url: ")
+novel_page_url = "https://sangtacviet.vip/truyen/fanqie/1/7183550349356043279/"#input("novel page url: ")
 starting_chapter = 1#input("starting chapter to scrap: ")
 download_folder_path = "download"#input("Download Folder Path: ")
 
