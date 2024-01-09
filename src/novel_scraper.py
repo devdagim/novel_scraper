@@ -275,20 +275,12 @@ class NovelScraper:
 
     def _validated_starting_chapter(self, starting_chapter: int) -> Union[int, None]:
         """Validates the starting chapter index."""
-        while True:
-            total_chapter = len(self.chapters_id)
-            starting_chapter = starting_chapter - 1
+        total_chapter = len(self.chapters_id)
+        starting_chapter = starting_chapter - 1
 
-            if all([starting_chapter < 0, starting_chapter > total_chapter]):
-                print(
-                    f"Error: The starting chapter must be in range between [1-{total_chapter}].\n"
-                )
-                starting_chapter = int(
-                    input(f"Please enter the correct one [1-{total_chapter}]: ")
-                )
-                starting_chapter = starting_chapter - 1
-            else:
-                return starting_chapter
+        if all([starting_chapter < 0, starting_chapter > total_chapter]):
+            return starting_chapter
+        return None
 
     def _remove_ads(self):
         """Removes ads from the page."""
