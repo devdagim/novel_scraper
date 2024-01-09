@@ -278,7 +278,7 @@ class NovelScraper:
         total_chapter = len(self.chapters_id)
         starting_chapter = starting_chapter - 1
 
-        if all([starting_chapter < 0, starting_chapter > total_chapter]):
+        if all([starting_chapter > -1, starting_chapter <= total_chapter]):
             return starting_chapter
         return None
 
