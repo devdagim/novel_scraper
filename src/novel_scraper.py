@@ -167,8 +167,8 @@ class NovelScraper:
             raise EmptyChapterListError(
                 "Failed to retrieve the chapter list. The list is empty."
             )
-        print(">>(info): list of chapters id:", self.scraper_items.chapters_id)
-        print(">>(info): total chapters:", len(self.scraper_items.chapters_id))
+        print(">>(info): list of chapters id:", self.chapters_id)
+        print(">>(info): total chapters:", len(self.chapters_id))
 
         download_path = self._validate_download_path(download_folder_path)
         if not download_path:
