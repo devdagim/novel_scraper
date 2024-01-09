@@ -195,6 +195,7 @@ class NovelScraper:
             chapter_page = f"{novel_page_url}{chapter_id_list[chapter_num]}/"
             self.page.goto(chapter_page, wait_until="load", timeout=210000)
 
+            self.page.wait_for_selector("#content-container .contentbox",timeout=210000)
             while True:
                 self.page.locator("html").click(timeout=210000)
                 self.page.wait_for_load_state("networkidle", timeout=210000)
