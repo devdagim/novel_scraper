@@ -11,6 +11,7 @@ import os
 import sys
 
 # Set UTF-8 as the global output encoder
+os.device_encoding()
 os.environ["PYTHONUTF8OUTPUT"] = "1"
 
 print("-----------test encoding: ", sys.stdout.encoding)
@@ -255,7 +256,8 @@ class NovelScraper:
     def _get_novel_name(self) -> str:
         """Extracts the novel name from the page."""
         novel_name = self.page.locator("h1#book_name2").text_content()
-        sys.stdout.buffer.write(novel_name.encode("utf-8"))
+        novel_name = novel_name.encode("utf-8", "replace").decode("utf-8", "replace")
+        # sys.stdout.buffer.write(novel_name.encode("utf-8"))
         print("---------",novel_name)
 
         return novel_name
