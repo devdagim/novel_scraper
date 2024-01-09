@@ -158,6 +158,7 @@ class NovelScraper:
                 "Novel name is null. Unable to extract the novel name"
             )
 
+        print(">>------------------test: ",novel_name)
         novel_name_in_eng = self._translate(novel_name)
         print(">>(info):","novel name in eng:",novel_name_in_eng)
         if not novel_name_in_eng:
