@@ -378,7 +378,7 @@ class NovelScraper:
         pytesseract.pytesseract.tesseract_cmd = r'build/tesseract_ocr/tesseract.exe'
         chapter_content_txt = pytesseract.image_to_string(image, lang="vie")
 
-        return chapter_content_txt
+        return chapter_content_txt.encode('utf-8').decode('utf-8')
 
     def _save_chapter(self, chapter_num: int, chapter_content: str) -> bool:
         """Saves the translated chapter content to a file."""
