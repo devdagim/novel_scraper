@@ -218,20 +218,20 @@ class NovelScraper:
         download_folder_path: str,
     ):
         """Main scraping method."""
-        try:
-            self._start_playwright()
-            self._launch_browser()
-            self._initialize_page()
-            self._scrape_novel_page(novel_page_url, download_folder_path)
-            self._scrape_chapter_page(novel_page_url, int(starting_chapter))
-            self._close_browser()
+        # try:
+        self._start_playwright()
+        self._launch_browser()
+        self._initialize_page()
+        self._scrape_novel_page(novel_page_url, download_folder_path)
+        self._scrape_chapter_page(novel_page_url, int(starting_chapter))
+        self._close_browser()
 
-        except Exception as e:
-            print(">>(Error): Errors Occurred during scraping")
-            print(">>(Error_Message):", e)
+        # except Exception as e:
+        #     print(">>(Error): Errors Occurred during scraping")
+        #     print(">>(Error_Message):", e)
 
-        finally:
-            self._stop_playwright()
+        # finally:
+        #     self._stop_playwright()
 
     def _get_chapter_list(self, res: Response):
         """Extracts chapter list from the response."""
