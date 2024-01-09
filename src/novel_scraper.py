@@ -10,10 +10,10 @@ import re
 import os
 import sys
 
-# set utf as gloabal encoder
-os.environ["PYTHONUTF8"] = "1"
+# Set UTF-8 as the global output encoder
+os.environ["PYTHONUTF8OUTPUT"] = "1"
 
-print("-----------test encoding: ",sys.stdout.encoding)
+print("-----------test encoding: ", sys.stdout.encoding)
 
 # Third-Party Library Imports
 import pytesseract
