@@ -362,13 +362,13 @@ class NovelScraper:
         """Translates text to English."""
         translator = Translator()
 
-        try:
-            translations = translator.translate(text, src="vi", dest="en")
-            translated_text = translations.text
-            return translated_text
-        except Exception as e:
-            logging.error(f"Translation error: {e}")
-            return None
+        # try:
+        translations = translator.translate(text, src="vi", dest="en")
+        translated_text = translations.text
+        return translated_text
+        # except Exception as e:
+        #     logging.error(f"Translation error: {e}")
+        #     return None
 
     def _extract_chapter_content(self, chapter_content_bytes):
         """Extracts chapter content from the screenshot."""
