@@ -3,7 +3,7 @@ name: Novel scraper testser for window
 on:
   push:
     branches:
-      - main
+      - dev
 
 jobs:
   test_script:
