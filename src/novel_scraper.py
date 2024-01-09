@@ -10,6 +10,8 @@ import re
 import os
 import sys
 
+sys.stdout.reconfigure(encoding='utf-8')
+
 # Set UTF-8 as the global output encoder
 # os.device_encoding()
 # os.environ["PYTHONUTF8"] = str(1)
@@ -259,8 +261,6 @@ class NovelScraper:
 
         # sys.stdout.buffer.write(novel_name.encode("utf-8"))
         # Try changing the default encoding to UTF-8
-        import sys
-        sys.stdout.reconfigure(encoding='utf-8')
         
         print("---------",novel_name.encode("utf-8","replace").decode("utf-8","replace"))
 
@@ -355,9 +355,10 @@ class NovelScraper:
 
     def _create_novel_folder(self, download_path, novel_name) -> str:
         """Creates a folder for the novel."""
-        novel_folder_name = novel_name.replace("/", "").replace("\\", "")
-        novel_folder_path = os.path.join(download_path, novel_folder_name)
+        # Replace invalid characters with underscores
+        sanitized_novel_name = ''.join(c if c.isalnum() or c in (' ', '-') else '_' for c in novel_name.strip())
 
+        novel_folder_path = os.path.join(download_path, sanitized_novel_name[:250])
         if not os.path.exists(novel_folder_path):
             os.makedirs(novel_folder_path, exist_ok=True)
 
