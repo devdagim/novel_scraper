@@ -28,13 +28,6 @@ from src.scraper_expectation import (
 
 
 
-@dataclass
-class ScraperItems:
-    novel_name: str
-    chapters_id: List[int]
-    novel_folder_path: str
-
-
 # ANSI escape codes for color
 RED = "\033[91m"
 RESET = "\033[0m"
@@ -48,9 +41,9 @@ class NovelScraper:
     ]
 
     def __init__(self):
-        self.scraper_items = ScraperItems(
-            novel_name="", chapters_id=[], novel_folder_path=""
-        )
+        self.novel_name: str
+        self.chapters_id: List[int]
+        self.novel_folder_path: str
 
     # Playwright Utilities
 
@@ -150,8 +143,8 @@ class NovelScraper:
         print(">>(info):","loading novel page url:",novel_page_url)
         self.page.goto(novel_page_url,wait_until="load",timeout=24000)
 
-        self._get_novel_name()
-        novel_name = self.scraper_items.novel_name
+        
+        novel_name = self._get_novel_name()
         print(">>(info):","novel name extracted:",novel_name)
         if not novel_name:
             raise NovelNameError(
@@ -166,8 +159,8 @@ class NovelScraper:
                 f"Failed to translate novel name: {novel_name}. The translation result is empty."
             )
 
-        print(">>(info): chapters_id:", self.scraper_items.chapters_id)
-        if not self.scraper_items.chapters_id:
+        print(">>(info): chapters_id:", self.chapters_id)
+        if not self.chapters_id:
             raise EmptyChapterListError(
                 "Failed to retrieve the chapter list. The list is empty."
             )
@@ -178,11 +171,11 @@ class NovelScraper:
         )
 
         print(">>(info): novel folder created:", novel_folder_path)
-        self.scraper_items.novel_folder_path = novel_folder_path
+        self.novel_folder_path = novel_folder_path
 
     def _scrape_chapter_page(self, novel_page_url: str, starting_chapter: str):
         """Scrapes content from each chapter page."""
-        chapter_id_list = self.scraper_items.chapters_id
+        chapter_id_list = self.chapters_id
         starting_chapter = self._validated_starting_chapter(starting_chapter)
 
         for chapter_num in range(starting_chapter, len(chapter_id_list)):
@@ -253,14 +246,14 @@ class NovelScraper:
                     int(chapter_id) for chapter_id in chapters_id
                 ]
 
-                self.scraper_items.chapters_id = sorted(chapter_id_list)
+                self.chapters_id = sorted(chapter_id_list)
 
-    def _get_novel_name(self):
+    def _get_novel_name(self) -> str:
         """Extracts the novel name from the page."""
         novel_name_text = self.page.locator("h1#book_name2").text_content()
         novel_name = sys.stdout.buffer.write(novel_name_text.encode("utf-8"))
 
-        self.scraper_items.novel_name = novel_name
+        return novel_name
 
     def _validated_url(self, novel_page_url: str) -> Union[str, None]:
         """Validates and formats the novel page URL."""
@@ -294,7 +287,7 @@ class NovelScraper:
     ) -> Union[int, None]:
         """Validates the starting chapter index."""
         while True:
-            total_chapter = len(self.scraper_items.chapters_id)
+            total_chapter = len(self.chapters_id)
             starting_chapter = starting_chapter - 1
 
             if all([starting_chapter < 0, starting_chapter > total_chapter]):
@@ -383,7 +376,7 @@ class NovelScraper:
 
     def _save_chapter(self, chapter_num: int, chapter_content: str) -> bool:
         """Saves the translated chapter content to a file."""
-        novel_folder_path = self.scraper_items.novel_folder_path
+        novel_folder_path = self.novel_folder_path
         chapter_txt_path = os.path.join(
             novel_folder_path, f"{chapter_num+1}.txt"
         )
