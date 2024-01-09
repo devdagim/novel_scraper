@@ -258,9 +258,8 @@ class NovelScraper:
         novel_name = self.page.locator("h1#book_name2").text_content()
 
         # sys.stdout.buffer.write(novel_name.encode("utf-8"))
-        import unicodedata
-        novel_name = unicodedata.normalize('NFKD', novel_name).encode('utf-8', 'ignore').decode('utf-8', 'ignore')
-        print("---------",f"{novel_name}")
+        
+        print("---------",type(novel_name))
 
         return novel_name
 
