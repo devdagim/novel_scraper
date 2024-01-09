@@ -4,7 +4,6 @@ sys.stdout.reconfigure(encoding="utf-8")
 
 # Standard Library Imports
 from time import sleep
-from typing import Union, List
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
@@ -40,9 +39,9 @@ class NovelScraper:
     ]
 
     def __init__(self):
-        self.novel_name: str
-        self.chapters_id: List[int]
-        self.novel_folder_path: str
+        self.novel_name = None
+        self.chapters_id = None
+        self.novel_folder_path = None
 
     # Playwright Utilities
 
@@ -254,7 +253,7 @@ class NovelScraper:
 
         return novel_name
 
-    def _validated_url(self, novel_page_url: str) -> Union[str, None]:
+    def _validated_url(self, novel_page_url: str) -> str:
         """Validates and formats the novel page URL."""
         url = novel_page_url
 
@@ -273,7 +272,7 @@ class NovelScraper:
                 return f"{url}/"
         return None
 
-    def _validated_starting_chapter(self, starting_chapter: int) -> Union[int, None]:
+    def _validated_starting_chapter(self, starting_chapter: int) -> int:
         """Validates the starting chapter index."""
         total_chapter = len(self.chapters_id)
         starting_chapter = starting_chapter - 1
@@ -296,7 +295,7 @@ class NovelScraper:
             )
             return "removed"
 
-    def _validate_download_path(self, download_path: str = None) -> Union[str, None]:
+    def _validate_download_path(self, download_path: str = None) -> str:
         """Validates and formats the download folder path."""
         download_path = str(download_path).strip()
 
@@ -323,7 +322,7 @@ class NovelScraper:
 
         return novel_folder_path
 
-    def _translate(self, text: str) -> Union[str, None]:
+    def _translate(self, text: str) -> str:
         """Translates text to English."""
         translator = Translator()
 
