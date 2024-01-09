@@ -256,10 +256,8 @@ class NovelScraper:
 
     def _get_novel_name(self):
         """Extracts the novel name from the page."""
-        novel_name_pic_bytes = self.page.locator("h1#book_name2").screenshot()
-        novel_name = self._extract_chapter_content(
-            novel_name_pic_bytes
-        )
+        novel_name_text = self.page.locator("h1#book_name2").text_content()
+        novel_name = sys.stdout.buffer.write(novel_name_text.encode("utf-8"))
 
         self.scraper_items.novel_name = novel_name
 
