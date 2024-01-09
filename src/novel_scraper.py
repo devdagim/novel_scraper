@@ -10,6 +10,10 @@ import re
 import os
 import sys
 
+# set utf as gloabal encoder
+os.environ["PYTHONUTF8"] = "1"
+
+print("-----------test encoding: ",sys.stdout.encoding)
 
 # Third-Party Library Imports
 import pytesseract
@@ -252,6 +256,7 @@ class NovelScraper:
         """Extracts the novel name from the page."""
         novel_name = self.page.locator("h1#book_name2").text_content()
         sys.stdout.buffer.write(novel_name.encode("utf-8"))
+        sys.stdout.c
         print("---------",novel_name)
 
         return novel_name
