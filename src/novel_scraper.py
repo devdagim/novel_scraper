@@ -258,6 +258,9 @@ class NovelScraper:
         novel_name = self.page.locator("h1#book_name2").text_content()
 
         # sys.stdout.buffer.write(novel_name.encode("utf-8"))
+        # Try changing the default encoding to UTF-8
+        import sys
+        sys.stdout.reconfigure(encoding='utf-8')
         
         print("---------",novel_name.encode("utf-8","replace").decode("utf-8","replace"))
 
