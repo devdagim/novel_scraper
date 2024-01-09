@@ -376,9 +376,11 @@ class NovelScraper:
         """Extracts chapter content from the screenshot."""
         image = Image.open(io.BytesIO(chapter_content_bytes))
         pytesseract.pytesseract.tesseract_cmd = r'build/tesseract_ocr/tesseract.exe'
-        chapter_content_txt = pytesseract.image_to_string(image, lang="vie")
+        chapter_content = pytesseract.image_to_string(image, lang="vie")
 
-        return chapter_content_txt.encode('utf-8','replace').decode('utf-8')
+        chapter_content_txt = sys.stdout.buffer.write(chapter_content.encode('utf8'))
+
+        return chapter_content_txt
 
     def _save_chapter(self, chapter_num: int, chapter_content: str) -> bool:
         """Saves the translated chapter content to a file."""
