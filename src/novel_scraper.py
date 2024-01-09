@@ -275,10 +275,12 @@ class NovelScraper:
 
     def _validated_starting_chapter(self, starting_chapter: int) -> Union[int, None]:
         """Validates the starting chapter index."""
+        print("----test-log:",starting_chapter)
         total_chapter = len(self.chapters_id)
         starting_chapter = starting_chapter - 1
+        print("----test-log:",starting_chapter)
 
-        if all([starting_chapter > -1, starting_chapter <= total_chapter]):
+        if starting_chapter > -1 and starting_chapter <= total_chapter:
             return starting_chapter
         return None
 
