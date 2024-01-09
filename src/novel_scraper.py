@@ -351,6 +351,14 @@ class NovelScraper:
 
     def _save_chapter(self, chapter_num: int, chapter_content: str) -> bool:
         """Saves the translated chapter content to a file."""
+        print(
+            ">>(info): chapter:",
+            chapter_num + 1,
+            " before translate:",
+            chapter_content[:62],
+            "....",
+        )
+
         novel_folder_path = self.novel_folder_path
         chapter_txt_path = os.path.join(novel_folder_path, f"{chapter_num+1}.txt")
 
@@ -364,21 +372,7 @@ class NovelScraper:
         for p in paragraphs:
             p = str(p).strip()
             if p:
-                print(
-                    ">>(info): paragraph of chapter:",
-                    chapter_num + 1,
-                    " before translate:",
-                    p[:62],
-                    "...."
-                )
                 translation_result = self._translate(p)
-                print(
-                    ">>(info): paragraph of chapter:",
-                    chapter_num + 1,
-                    " after translate:",
-                    translation_result[:62],
-                    "...."
-                )
 
             if translation_result is not None:
                 translated_chapter += translation_result + "\n"
@@ -388,6 +382,14 @@ class NovelScraper:
         if not translated_chapter:
             print(
                 f"(waring): Unable to translate chapter {chapter_num} content; saved as it is."
+            )
+        else:
+            print(
+                ">>(info): chapter:",
+                chapter_num + 1,
+                " after translate:",
+                translated_chapter[:62],
+                "....",
             )
 
         try:
