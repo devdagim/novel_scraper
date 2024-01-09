@@ -4,6 +4,7 @@ sys.stdout.reconfigure(encoding="utf-8")
 
 # Standard Library Imports
 from time import sleep
+from random import uniform
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
@@ -276,7 +277,9 @@ class NovelScraper:
     
                     self.chapters_id = sorted(chapter_id_list)
                     return 1
-            retry += 1
+                
+                retry += 1
+                sleep(uniform(0.99,1.99))
 
     def _get_novel_name(self) -> str:
         """Extracts the novel name from the page."""
