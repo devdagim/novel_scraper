@@ -21,7 +21,7 @@ jobs:
           playwright install
 
       - name: Run scraper
-        run: python main.py > scrapit_test_logs.txt
+        run: python -u main.py > scrapit_test_logs.txt
         continue-on-error: true
 
       - name: Upload scrapit_test_logs by artifact
